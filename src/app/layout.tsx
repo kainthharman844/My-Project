@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lens Crafter Hub",
+  title: "Urban Clothes",
   description: "This is my First E-commerce Website",
 
 };

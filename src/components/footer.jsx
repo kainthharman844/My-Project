@@ -1,104 +1,111 @@
 "use client"
 import Link from 'next/link';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail('');
+    // TODO: wire to your newsletter API
+  };
+
+  const socials = [
+    { icon: FaFacebook, href: '#', label: 'Facebook' },
+    { icon: FaTwitter,  href: '#', label: 'Twitter' },
+    { icon: FaInstagram, href: 'https://www.instagram.com/jot1877g/', label: 'Instagram' },
+    { icon: FaLinkedin, href: '#', label: 'LinkedIn' },
+  ];
+
+  // Only these six links
+  const navLinks = [
+    { name: 'HOME',        path: '/' },
+    { name: 'SHOP',        path: '/pages/products-page' },
+    { name: 'ABOUT',       path: '/pages/about' },
+
+  ];
+
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* About Us */}
+    <footer className="relative bg-neutral-950 text-white pt-16 pb-8 border-t border-white/5 overflow-hidden">
+      {/* subtle glow */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[36rem] rounded-full bg-amber-400/10 blur-3xl" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* ── Top: brand + newsletter ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 pb-12 border-b border-white/10">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">About VisionElegance</h3>
-            <p className="text-gray-400">
-              We provide premium eyewear that combines style, comfort, and quality to give you the perfect vision solution.
+            <Link href="/" className="inline-block text-2xl sm:text-3xl font-black tracking-tighter">
+              URBAN<span className="text-amber-400">.</span>CLOTHES
+            </Link>
+            <p className="text-neutral-400 max-w-md text-sm leading-relaxed">
+              Premium urban apparel built for comfort, movement, and everyday city life.
+              Bold fits, quality fabrics, and drops that keep up with the streets.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <FaFacebook size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <FaTwitter size={20} />
-              </a>
-              <a href="https://www.instagram.com/jot1877g/" className="text-gray-400 hover:text-white transition-colors">
-                <FaInstagram size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <FaLinkedin size={20} />
-              </a>
+
+            {/* Social icons */}
+            <div className="flex gap-2 pt-2">
+              {socials.map(({ icon: Icon, href, label }) => (
+                <motion.a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  whileHover={{ y: -3, scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-white/5 text-neutral-400 hover:bg-amber-400 hover:text-neutral-950 transition-colors"
+                >
+                  <Icon size={16} />
+                </motion.a>
+              ))}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Quick Links</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              </li>
-              <li>
-                <Link href="pages/products" className="hover:text-white transition-colors">Products</Link>
-              </li>
-              <li>
-                <Link href="pages/about" className="hover:text-white transition-colors">About Us</Link>
-              </li>
-              <li>
-                <Link href="pages/contact" className="hover:text-white transition-colors">Contact</Link>
-              </li>
-              
-            </ul>
-          </div>
 
-          {/* Customer Service */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Customer Service</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <Link href="/faq" className="hover:text-white transition-colors">FAQs</Link>
-              </li>
-              <li>
-                <Link href="/shipping" className="hover:text-white transition-colors">Shipping Policy</Link>
-              </li>
-              <li>
-                <Link href="/returns" className="hover:text-white transition-colors">Return Policy</Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact Us</h3>
-            <address className="not-italic text-gray-400">
-              <p>646X+78Q, Chandigarh Road, near Oasis Hotel, Garhshankar, Punjab 144527, India</p>
-              <p>Garhshanker, Punjab, India, 144527</p>
-              <p className="mt-2">Email: Singh123@lenscrafterhub.com</p>
-              <p>Phone: +91 62834 27681</p>
-            </address>
-            <div className="pt-2">
-              <h4 className="font-medium">Newsletter</h4>
-              <div className="mt-2 flex">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="px-3 py-2 bg-gray-800 text-white rounded-l-md focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full"
-                />
-                <button className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-r-md transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} VisionElegance. All rights reserved.</p>
+        {/* ── Navigation links ── */}
+        <nav className="py-10">
+          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <Link
+                  href={link.path}
+                  className="text-neutral-300 hover:text-amber-400 font-medium transition-colors"
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* ── Trust badges ── */}
+        <div className="flex flex-wrap items-center justify-center gap-4 py-6 border-t border-white/10 text-[11px] uppercase tracking-widest text-neutral-500">
+          <span>Secure Checkout</span>
+          <span className="text-amber-400/40">·</span>
+          <span>Free Shipping ₹1500+</span>
+          <span className="text-amber-400/40">·</span>
+          <span>30-Day Returns</span>
+          <span className="text-amber-400/40">·</span>
+          <span>Made in India</span>
+        </div>
+
+        {/* ── Bottom copyright ── */}
+        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
+          <p>© {new Date().getFullYear()} UrbanClothes. All rights reserved.</p>
+          <div className="flex gap-5">
+            {['Privacy', 'Terms', 'Cookies'].map((l) => (
+              <Link key={l} href={`/${l.toLowerCase()}`} className="hover:text-amber-400 transition-colors">
+                {l}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

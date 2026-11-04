@@ -20,7 +20,7 @@ export default function ProductsPage() {
   const [filters, setFilters] = useState({
     category: '',
     gender: '',
-    frameType: '',
+    size: '',
     search: '',
   });
   const controls = useAnimation();
@@ -29,10 +29,7 @@ export default function ProductsPage() {
   const fetchProducts = async (page = 1, filterParams = {}) => {
     try {
       setLoading(true);
-      controls.start({
-        opacity: 0,
-        transition: { duration: 0.3 },
-      });
+      controls.start({ opacity: 0, transition: { duration: 0.3 } });
 
       const queryParams = new URLSearchParams({
         page,
@@ -48,17 +45,13 @@ export default function ProductsPage() {
         setPagination(data.pagination);
         setError(null);
 
-        // Initialize active image index for each product
         const initialIndices = {};
         data.products.forEach((product) => {
           initialIndices[product._id] = 0;
         });
         setActiveImageIndex(initialIndices);
 
-        controls.start({
-          opacity: 1,
-          transition: { duration: 0.5 },
-        });
+        controls.start({ opacity: 1, transition: { duration: 0.5 } });
       } else {
         setError(data.error || 'Failed to fetch products');
       }
@@ -81,10 +74,7 @@ export default function ProductsPage() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSearchSubmit = (e) => {
@@ -93,16 +83,9 @@ export default function ProductsPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({
-      category: '',
-      gender: '',
-      frameType: '',
-      search: '',
-    });
-    fetchProducts(1, { category: '', gender: '', frameType: '', search: '' });
-    if (searchInputRef.current) {
-      searchInputRef.current.value = '';
-    }
+    setFilters({ category: '', gender: '', size: '', search: '' });
+    fetchProducts(1, { category: '', gender: '', size: '', search: '' });
+    if (searchInputRef.current) searchInputRef.current.value = '';
   };
 
   const handleNextImage = (productId) => {
@@ -126,26 +109,20 @@ export default function ProductsPage() {
   const handleAddToCart = (e, product) => {
     e.preventDefault();
     e.stopPropagation();
-    // Implement your cart logic here
     alert(`${product.name} added to cart`);
   };
 
   const handleAddToWishlist = (e, product) => {
     e.preventDefault();
     e.stopPropagation();
-    // Implement your wishlist logic here
     alert(`${product.name} added to wishlist`);
   };
 
-  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        when: 'beforeChildren',
-      },
+      transition: { staggerChildren: 0.1, when: 'beforeChildren' },
     },
   };
 
@@ -154,11 +131,7 @@ export default function ProductsPage() {
     show: {
       opacity: 1,
       y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 15,
-      },
+      transition: { type: 'spring', stiffness: 100, damping: 15 },
     },
   };
 
@@ -166,131 +139,183 @@ export default function ProductsPage() {
     <motion.div
       key={index}
       variants={item}
-      className="border rounded-xl overflow-hidden shadow-sm bg-white/50 backdrop-blur-sm"
+      className="rounded-2xl overflow-hidden bg-neutral-900 border border-white/5"
     >
-      <div className="relative h-64 bg-gradient-to-r from-gray-100 to-gray-200 animate-pulse rounded-t-xl"></div>
-      <div className="p-4 space-y-3">
-        <div className="h-5 bg-gray-200 rounded-full w-3/4 animate-pulse"></div>
-        <div className="h-4 bg-gray-200 rounded-full w-1/2 animate-pulse"></div>
-        <div className="h-4 bg-gray-200 rounded-full w-1/3 animate-pulse"></div>
+      <div className="relative aspect-square bg-neutral-800 animate-pulse" />
+      <div className="p-5 space-y-3">
+        <div className="h-4 bg-neutral-800 rounded-full w-3/4 animate-pulse" />
+        <div className="h-3 bg-neutral-800 rounded-full w-1/2 animate-pulse" />
+        <div className="h-3 bg-neutral-800 rounded-full w-1/3 animate-pulse" />
         <div className="flex justify-between mt-4">
-          <div className="h-6 bg-gray-200 rounded-full w-1/4 animate-pulse"></div>
-          <div className="h-6 bg-gray-200 rounded-full w-1/3 animate-pulse"></div>
+          <div className="h-5 bg-neutral-800 rounded-full w-1/4 animate-pulse" />
+          <div className="h-5 bg-neutral-800 rounded-full w-1/3 animate-pulse" />
         </div>
       </div>
     </motion.div>
   ));
 
+  const hasActiveFilters =
+    filters.category || filters.gender || filters.size || filters.search;
+
   return (
     <>
-      <Navbar/>
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-20">
-        <div className="container mx-auto px-4 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, type: 'spring' }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-              Discover Our Collection
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore our premium selection of products designed to elevate your experience.
-            </p>
-          </motion.div>
+    
+      <div className="min-h-screen bg-neutral-950 text-white pt-[100px]">
 
-          {/* Filter Section */}
+        {/* ── HERO HEADER ── */}
+        <section className="relative overflow-hidden border-b border-white/5">
+          <div className="pointer-events-none absolute inset-0">
+            <motion.div
+              className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-amber-400/15 blur-3xl"
+              animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-rose-400/10 blur-3xl"
+              animate={{ x: [0, -30, 0], y: [0, -20, 0] }}
+              transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, type: 'spring' }}
+              className="text-center"
+            >
+              <span className="inline-block mb-4 px-4 py-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-xs font-bold tracking-widest uppercase">
+                The Collection
+              </span>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-[0.95]">
+                SHOP THE <span className="text-amber-400">DROP</span>
+              </h1>
+              <p className="mt-4 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
+                Premium urban apparel built for comfort, movement, and everyday city life.
+                Filter, sort, and find your fit.
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+
+          {/* ── FILTERS ── */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-10 bg-white rounded-xl shadow-md p-6 border border-gray-200"
+            className="mb-10 bg-neutral-900 rounded-2xl border border-white/5 p-5 sm:p-6"
           >
-          <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-              </label>
-              <select
-                name="category"
-                value={filters.category}
-                onChange={handleFilterChange}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">All Categories</option>
-                <option value="Eyeglasses">Eyeglasses</option>
-                <option value="Sunglasses">Sunglasses</option>
-                <option value="Contact Lenses">Contact Lenses</option>
-                <option value="Accessories">Accessories</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gender
-              </label>
-              <select
-                name="gender"
-                value={filters.gender}
-                onChange={handleFilterChange}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">All Genders</option>
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Unisex">Unisex</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Frame Type
-              </label>
-              <select
-                name="frameType"
-                value={filters.frameType}
-                onChange={handleFilterChange}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">All Frame Types</option>
-                <option value="Full Rim">Full Rim</option>
-                <option value="Half Rim">Half Rim</option>
-                <option value="Rimless">Rimless</option>
-              </select>
-            </div>
-            <div className="flex items-end gap-2">
-              
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-              >
-                Apply
-              </motion.button>
-            </div>
-          </form>
-          {(filters.category || filters.gender || filters.frameType || filters.search) && (
-            <motion.button
-              onClick={handleClearFilters}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="mt-4 text-sm text-blue-600 hover:text-blue-700 underline"
-            >
-              Clear Filters
-            </motion.button>
-          )}
-        </motion.div>
+            <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={filters.category}
+                  onChange={handleFilterChange}
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-950 border border-white/10 text-white focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                >
+                  <option value="">All Categories</option>
+                  <option value="Hoodies">Hoodies</option>
+                  <option value="Tees">Tees</option>
+                  <option value="Jackets">Jackets</option>
+                  <option value="Joggers">Joggers</option>
+                  <option value="Denim">Denim</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
+              </div>
 
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={filters.gender}
+                  onChange={handleFilterChange}
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-950 border border-white/10 text-white focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                >
+                  <option value="">All Genders</option>
+                  <option value="Men">Men</option>
+                  <option value="Women">Women</option>
+                  <option value="Unisex">Unisex</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                  Size
+                </label>
+                <select
+                  name="size"
+                  value={filters.size}
+                  onChange={handleFilterChange}
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-950 border border-white/10 text-white focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                >
+                  <option value="">All Sizes</option>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                  Search
+                </label>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  name="search"
+                  value={filters.search}
+                  onChange={handleFilterChange}
+                  placeholder="Hoodie, jacket..."
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-950 border border-white/10 text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                />
+              </div>
+
+              <div className="flex items-end">
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full px-4 py-2.5 rounded-xl bg-amber-400 text-neutral-950 font-bold text-sm hover:bg-amber-300 transition-colors flex items-center justify-center gap-2"
+                >
+                  <FiSearch className="w-4 h-4" />
+                  Apply Filters
+                </motion.button>
+              </div>
+            </form>
+
+            {hasActiveFilters && (
+              <motion.button
+                onClick={handleClearFilters}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-4 text-xs font-bold uppercase tracking-widest text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                Clear Filters ×
+              </motion.button>
+            )}
+          </motion.div>
+
+          {/* ── RESULTS ── */}
           {error ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl max-w-md mx-auto text-center shadow-sm"
+              className="bg-red-500/10 border border-red-500/30 text-red-300 px-6 py-4 rounded-2xl max-w-md mx-auto text-center"
             >
               <p className="mb-3">{error}</p>
               <button
                 onClick={() => fetchProducts(pagination.currentPage, filters)}
-                className="mt-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-all duration-300 shadow hover:shadow-md"
+                className="mt-2 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-5 rounded-full text-sm transition-colors"
               >
                 Retry
               </button>
@@ -301,226 +326,248 @@ export default function ProductsPage() {
                 variants={container}
                 initial="hidden"
                 animate={loading ? 'hidden' : 'show'}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               >
                 <AnimatePresence mode="wait">
-                  {loading ? (
-                    loadingSkeleton
-                  ) : (
-                    products.map((product) => (
-                      <motion.div
-                        key={product._id}
-                        variants={item}
-                        whileHover={{ y: -8, scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                        className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
-                      >
-                        <Link href={`products/${product._id}`} className="block group">
-                          <div className="relative h-64">
-                            {product.images && product.images.length > 0 ? (
-                              <>
-                                <Image
-                                  src={product.images[activeImageIndex[product._id]]?.url || '/placeholder-product.jpg'}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover transition-opacity duration-500"
-                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                  priority={products.indexOf(product) < 4}
-                                />
-                                {/* Quick actions overlay */}
-                                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                                  <button
-                                    onClick={(e) => handleAddToCart(e, product)}
-                                    className="bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
-                                    aria-label="Buy Now"
+                  {loading
+                    ? loadingSkeleton
+                    : products.map((product) => (
+                        <motion.div
+                          key={product._id}
+                          variants={item}
+                          whileHover={{ y: -6 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                          className="group relative bg-neutral-900 rounded-2xl overflow-hidden border border-white/5 hover:border-amber-400/40 transition-colors"
+                        >
+                          <Link href={`products/${product._id}`} className="block">
+                            <div className="relative aspect-square bg-neutral-800 overflow-hidden">
+                              {product.images && product.images.length > 0 ? (
+                                <>
+                                  <motion.div
+                                    whileHover={{ scale: 1.08 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="absolute inset-0"
                                   >
-                                    <FiShoppingCart className="w-5 h-5" />
-                                  </button>
-                                  <button
-                                    onClick={(e) => handleAddToWishlist(e, product)}
-                                    className="bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75"
-                                    aria-label="Add to wishlist"
-                                  >
-                                    <FiHeart className="w-5 h-5" />
-                                  </button>
-                                </div>
-                                {/* Image navigation dots */}
-                                {product.images.length > 1 && (
-                                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                                    {product.images.map((_, idx) => (
+                                    <Image
+                                      src={product.images[activeImageIndex[product._id]]?.url || '/placeholder-product.jpg'}
+                                      alt={product.name}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                      priority={products.indexOf(product) < 4}
+                                    />
+                                  </motion.div>
+
+                                  {/* hover overlay with quick actions */}
+                                  <div className="absolute inset-0 bg-neutral-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                                    <motion.button
+                                      initial={{ y: 12, opacity: 0 }}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileInView={{ y: 0, opacity: 1 }}
+                                      onClick={(e) => handleAddToCart(e, product)}
+                                      className="bg-white hover:bg-amber-400 text-neutral-950 p-3 rounded-full shadow-lg transition-colors"
+                                      aria-label="Add to cart"
+                                    >
+                                      <FiShoppingCart className="w-5 h-5" />
+                                    </motion.button>
+                                    <motion.button
+                                      initial={{ y: 12, opacity: 0 }}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileInView={{ y: 0, opacity: 1 }}
+                                      transition={{ delay: 0.05 }}
+                                      onClick={(e) => handleAddToWishlist(e, product)}
+                                      className="bg-white hover:bg-amber-400 text-neutral-950 p-3 rounded-full shadow-lg transition-colors"
+                                      aria-label="Add to wishlist"
+                                    >
+                                      <FiHeart className="w-5 h-5" />
+                                    </motion.button>
+                                  </div>
+
+                                  {/* image dots */}
+                                  {product.images.length > 1 && (
+                                    <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                                      {product.images.map((_, idx) => (
+                                        <button
+                                          key={idx}
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setActiveImageIndex((prev) => ({ ...prev, [product._id]: idx }));
+                                          }}
+                                          className={`h-1.5 rounded-full transition-all ${
+                                            activeImageIndex[product._id] === idx
+                                              ? 'bg-amber-400 w-5'
+                                              : 'bg-white/50 w-1.5'
+                                          }`}
+                                          aria-label={`View image ${idx + 1}`}
+                                        />
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* arrows */}
+                                  {product.images.length > 1 && (
+                                    <>
                                       <button
-                                        key={idx}
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
-                                          setActiveImageIndex((prev) => ({
-                                            ...prev,
-                                            [product._id]: idx,
-                                          }));
+                                          handlePrevImage(product._id);
                                         }}
-                                        className={`w-2 h-2 rounded-full transition-all ${
-                                          activeImageIndex[product._id] === idx ? 'bg-white w-3' : 'bg-white/50'
-                                        }`}
-                                        aria-label={`View image ${idx + 1}`}
-                                      />
-                                    ))}
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-t-2xl">
-                                <span className="text-gray-400">No Image Available</span>
-                              </div>
-                            )}
-                            {/* Navigation arrows */}
-                            {product.images && product.images.length > 1 && (
-                              <>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handlePrevImage(product._id);
-                                  }}
-                                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                  aria-label="Previous image"
-                                >
-                                  <FiChevronLeft className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleNextImage(product._id);
-                                  }}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                  aria-label="Next image"
-                                >
-                                  <FiChevronRight className="w-4 h-4" />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                          <div className="p-5">
-                            <div className="flex justify-between items-start mb-2">
-                              <h2 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                                {product.name}
-                              </h2>
-                              <span className="text-lg font-bold text-blue-600 whitespace-nowrap ml-2">
-                                ₹{product.price.toFixed(2)}
-                              </span>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              <span className="text-xs px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full capitalize">
-                                {product.category}
-                              </span>
-                              {product.brand && (
-                                <span className="text-xs px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full">
-                                  {product.brand}
-                                </span>
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-950/70 hover:bg-amber-400 hover:text-neutral-950 text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all"
+                                        aria-label="Previous image"
+                                      >
+                                        <FiChevronLeft className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleNextImage(product._id);
+                                        }}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-950/70 hover:bg-amber-400 hover:text-neutral-950 text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all"
+                                        aria-label="Next image"
+                                      >
+                                        <FiChevronRight className="w-4 h-4" />
+                                      </button>
+                                    </>
+                                  )}
+                                </>
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span className="text-neutral-500 text-sm">No Image</span>
+                                </div>
                               )}
                             </div>
-                            <div className="flex items-center">
-                              <div className="flex items-center mr-2">
-                                {[...Array(5)].map((_, i) => (
-                                  <FiStar
-                                    key={i}
-                                    className={`w-4 h-4 ${i < Math.round(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-                                  />
-                                ))}
+
+                            <div className="p-5">
+                              <div className="flex justify-between items-start gap-2 mb-2">
+                                <h2 className="text-base font-bold text-white line-clamp-2 leading-tight">
+                                  {product.name}
+                                </h2>
+                                <span className="text-lg font-black text-amber-400 whitespace-nowrap">
+                                  ₹{product.price.toFixed(0)}
+                                </span>
                               </div>
-                              <span className="text-sm text-gray-500">
-                                ({product.numReviews || 0} {product.numReviews === 1 ? 'review' : 'reviews'})
-                              </span>
+
+                              <div className="flex flex-wrap gap-1.5 mb-3">
+                                <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 bg-amber-400/10 text-amber-300 rounded-full font-bold">
+                                  {product.category}
+                                </span>
+                                {product.brand && (
+                                  <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 bg-white/5 text-neutral-400 rounded-full font-bold">
+                                    {product.brand}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center">
+                                  {[...Array(5)].map((_, i) => (
+                                    <FiStar
+                                      key={i}
+                                      className={`w-3.5 h-3.5 ${
+                                        i < Math.round(product.rating || 0)
+                                          ? 'text-amber-400 fill-amber-400'
+                                          : 'text-neutral-700'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-xs text-neutral-500">
+                                  ({product.numReviews || 0})
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    ))
-                  )}
+                          </Link>
+                        </motion.div>
+                      ))}
                 </AnimatePresence>
               </motion.div>
 
-                         {/* Pagination */}
-           <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.3 }}
-             className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-16"
-           >
-             <div className="text-sm text-gray-600">
-               Showing {(pagination.currentPage - 1) * pagination.limit + 1}-
-               {Math.min(pagination.currentPage * pagination.limit, pagination.totalProducts)} of{' '}
-               {pagination.totalProducts} products
-             </div>
-             <div className="flex items-center gap-2">
-               <button
-                 onClick={() => handlePageChange(pagination.currentPage - 1)}
-                 disabled={pagination.currentPage === 1 || loading}
-                 className={`flex items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                   pagination.currentPage === 1 || loading
-                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:shadow-sm'
-                 }`}
-               >
-                 <FiChevronLeft className="w-4 h-4" />
-                 <span>Previous</span>
-               </button>
-               <div className="flex items-center gap-1">
-                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                   let pageNum;
-                   if (pagination.totalPages <= 5) {
-                     pageNum = i + 1;
-                   } else if (pagination.currentPage <= 3) {
-                     pageNum = i + 1;
-                   } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                     pageNum = pagination.totalPages - 4 + i;
-                   } else {
-                     pageNum = pagination.currentPage - 2 + i;
-                   }
+              {/* ── PAGINATION ── */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-16"
+              >
+                <div className="text-sm text-neutral-400">
+                  Showing{' '}
+                  <span className="text-white font-bold">
+                    {(pagination.currentPage - 1) * pagination.limit + 1}–
+                    {Math.min(pagination.currentPage * pagination.limit, pagination.totalProducts)}
+                  </span>{' '}
+                  of <span className="text-white font-bold">{pagination.totalProducts}</span> products
+                </div>
 
-                   return (
-                     <button
-                       key={pageNum}
-                       onClick={() => handlePageChange(pageNum)}
-                       disabled={loading}
-                       className={`w-10 h-10 rounded-lg transition-all flex items-center justify-center ${
-                         pagination.currentPage === pageNum
-                           ? 'bg-blue-600 text-white shadow-md'
-                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                       }`}
-                     >
-                       {pageNum}
-                     </button>
-                   );
-                 })}
-                 {pagination.totalPages > 5 && pagination.currentPage < pagination.totalPages - 2 && (
-                   <>
-                     <span className="text-gray-500 px-2">...</span>
-                     <button
-                       onClick={() => handlePageChange(pagination.totalPages)}
-                       disabled={loading}
-                       className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                     >
-                       {pagination.totalPages}
-                     </button>
-                   </>
-                 )}
-               </div>
-               <button
-                 onClick={() => handlePageChange(pagination.currentPage + 1)}
-                 disabled={pagination.currentPage === pagination.totalPages || loading}
-                 className={`flex items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                   pagination.currentPage === pagination.totalPages || loading
-                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:shadow-sm'
-                 }`}
-               >
-                 <FiChevronRight className="w-4 h-4" />
-                 <span>Next</span>
-               </button>
-             </div>
-           </motion.div>    
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1 || loading}
+                    className={`flex items-center gap-1 px-4 py-2 rounded-full transition-all text-sm font-bold ${
+                      pagination.currentPage === 1 || loading
+                        ? 'bg-white/5 text-neutral-600 cursor-not-allowed'
+                        : 'bg-white/5 hover:bg-white/10 text-white'
+                    }`}
+                  >
+                    <FiChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Previous</span>
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (pagination.totalPages <= 5) pageNum = i + 1;
+                      else if (pagination.currentPage <= 3) pageNum = i + 1;
+                      else if (pagination.currentPage >= pagination.totalPages - 2)
+                        pageNum = pagination.totalPages - 4 + i;
+                      else pageNum = pagination.currentPage - 2 + i;
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          disabled={loading}
+                          className={`w-10 h-10 rounded-full transition-all flex items-center justify-center font-bold text-sm ${
+                            pagination.currentPage === pageNum
+                              ? 'bg-amber-400 text-neutral-950 shadow-lg shadow-amber-400/30'
+                              : 'bg-white/5 hover:bg-white/10 text-white'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    {pagination.totalPages > 5 &&
+                      pagination.currentPage < pagination.totalPages - 2 && (
+                        <>
+                          <span className="text-neutral-500 px-1">…</span>
+                          <button
+                            onClick={() => handlePageChange(pagination.totalPages)}
+                            disabled={loading}
+                            className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-white font-bold text-sm"
+                          >
+                            {pagination.totalPages}
+                          </button>
+                        </>
+                      )}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages || loading}
+                    className={`flex items-center gap-1 px-4 py-2 rounded-full transition-all text-sm font-bold ${
+                      pagination.currentPage === pagination.totalPages || loading
+                        ? 'bg-white/5 text-neutral-600 cursor-not-allowed'
+                        : 'bg-white/5 hover:bg-white/10 text-white'
+                    }`}
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <FiChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
             </>
           )}
         </div>
