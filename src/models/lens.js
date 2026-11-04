@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Eyeglasses', 'Sunglasses', 'Contact Lenses', 'Accessories'],
+    enum: ['Hoodies', 'Tees', 'Jackets', 'Joggers', 'Denim', 'Accessories'],
     required: true,
   },
   brand: {
@@ -27,8 +27,7 @@ const productSchema = new mongoose.Schema({
         required: true,
       },
       publicId: {
-        type: String, 
-        required: true,
+        type: String,
       },
     },
   ], 
@@ -36,9 +35,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  frameType: {
-    type: String,
-    enum: ['Full Rim', 'Half Rim', 'Rimless'],
+  size: {
+    type: [String],
+    enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'],
+    default: ['S', 'M', 'L', 'XL'], // Default sizes if not specified
   },
   gender: {
     type: String,
@@ -49,6 +49,12 @@ const productSchema = new mongoose.Schema({
   },
   material: {
     type: String,
+    // Optional: You can enum this too if you want strict control
+    // enum: ['Cotton', 'Polyester Blend', 'Denim', 'Fleece', 'Nylon']
+  },
+  fit: {
+    type: String,
+    enum: ['Oversized', 'Regular', 'Slim', 'Boxy', 'Tapered'],
   },
   rating: {
     type: Number,
@@ -59,7 +65,7 @@ const productSchema = new mongoose.Schema({
       rating: {
         type: Number,
         min: 1,
-        max: 4,
+        max: 5, // Changed max to 5 since it was previously a bug (was set to 4)
         required: true,
       },
     },

@@ -1,6 +1,5 @@
-// pages/admin/login.js or app/admin/login/page.js (add "use client" for App Router)
 'use client';
-import { useState, useeffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -23,8 +22,7 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   });
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState('');
@@ -34,24 +32,14 @@ export default function AdminLogin() {
 
   // Handle input changes
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
     
-    // Clear error for the field being edited
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    
-    // Clear general login error
-    if (loginError) {
-      setLoginError('');
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (loginError) setLoginError('');
   };
 
   // Validate form
@@ -66,8 +54,6 @@ export default function AdminLogin() {
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     
     setErrors(newErrors);
@@ -84,40 +70,40 @@ export default function AdminLogin() {
     setLoginError('');
 
     try {
-      // Simulate API call - Replace with your actual authentication logic
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Demo credentials check
-          if (formData.email === 'admin@urbangear.com' && formData.password === 'admin123') {
-            resolve({ success: true, token: 'demo-token-123' });
-          } else {
-            reject(new Error('Invalid email or password'));
-          }
-        }, 2000);
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password
+        })
       });
+      const data = await response.json();
 
-      // Store auth token (if using JWT or similar)
-      if (formData.rememberMe) {
-        localStorage.setItem('adminToken', 'demo-token-123');
-      } else {
-        sessionStorage.setItem('adminToken', 'demo-token-123');
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to sign in. Please try again.');
       }
 
-      // Redirect to admin dashboard
-      router.push('/urbancloths/dashboard');
+      if (!data.token) {
+        throw new Error('The login service did not return an authentication token.');
+      }
+
+      localStorage.setItem('adminInfo', JSON.stringify(data));
+      localStorage.setItem('adminToken', data.token);
+      sessionStorage.removeItem('adminToken');
+      router.push('/urbancloths/admindashboard');
       
     } catch (error) {
-      setLoginError(error.message);
+      setLoginError(error.message || 'Unable to sign in. Please try again.');
       setIsLoading(false);
       
-      // Shake animation trigger
       const form = document.getElementById('login-form');
       form.classList.add('animate-shake');
       setTimeout(() => form.classList.remove('animate-shake'), 500);
     }
   };
 
-  // Floating particles for background
+  // Floating particles
   const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     size: Math.random() * 4 + 2,
@@ -127,36 +113,26 @@ export default function AdminLogin() {
   }));
 
   return (
-    <div className={`min-h-screen flex transition-colors duration-300 ${
-      isDarkMode 
-        ? 'bg-[#0A0A0A]' 
-        : 'bg-[#F5F5F5]'
+    <div className={`min-h-screen pt-22 flex transition-colors duration-300 ${
+      isDarkMode ? 'bg-neutral-950' : 'bg-neutral-50'
     }`}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
         
-        body {
-          font-family: 'Poppins', sans-serif;
-        }
+        body { font-family: 'Poppins', sans-serif; }
 
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
           20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
 
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(180deg); }
         }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
       `}</style>
 
       {/* Background Particles */}
@@ -164,50 +140,20 @@ export default function AdminLogin() {
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="absolute rounded-full bg-[#E71D2B]/10 dark:bg-[#E71D2B]/5"
+            className="absolute rounded-full bg-amber-400/10 dark:bg-amber-400/5"
             style={{
               width: particle.size + 'px',
               height: particle.size + 'px',
               left: particle.x + '%',
               top: Math.random() * 100 + '%',
             }}
-            animate={{
-              y: [-20, 20],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              delay: particle.delay,
-            }}
+            animate={{ y: [-20, 20], opacity: [0, 0.5, 0] }}
+            transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
           />
         ))}
       </div>
 
-      {/* Theme Toggle & Home Button */}
-      <div className="fixed top-4 right-4 z-50 flex items-center space-x-2">
-        {/* Home Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => router.push('/')}
-          className="p-3 rounded-xl bg-white/10 backdrop-blur-md border border-[#E5E5E5]/20 text-white hover:bg-white/20 transition-all"
-          title="Back to Home"
-        >
-          <HiOutlineHome size={20} />
-        </motion.button>
 
-        {/* Theme Toggle */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={toggleTheme}
-          className="p-3 rounded-xl bg-white/10 backdrop-blur-md border border-[#E5E5E5]/20 text-white hover:bg-white/20 transition-all"
-          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {isDarkMode ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
-        </motion.button>
-      </div>
 
       {/* Main Content */}
       <div className="w-full flex items-center justify-center p-4">
@@ -227,8 +173,8 @@ export default function AdminLogin() {
               transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
               className="mb-6 inline-block"
             >
-              <div className="w-20 h-20 bg-gradient-to-br from-[#E71D2B] to-[#FF4D5A] rounded-2xl flex items-center justify-center shadow-2xl shadow-[#E71D2B]/20">
-                <HiOutlineShieldCheck className="text-white" size={40} />
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-400/20">
+                <HiOutlineShieldCheck className="text-neutral-950" size={40} />
               </div>
             </motion.div>
 
@@ -236,19 +182,19 @@ export default function AdminLogin() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-4xl lg:text-5xl font-bold mb-4"
+              className="text-4xl lg:text-5xl font-black tracking-tighter mb-4"
             >
-              <span className="text-[#E71D2B]">URBAN</span>
-              <span className={isDarkMode ? 'text-white' : 'text-[#111111]'}>GEAR</span>
+              <span className="text-amber-400">URBAN</span>
+              <span className={isDarkMode ? 'text-white' : 'text-neutral-900'}>CLOTHES</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="text-lg mb-2"
+              className="text-lg mb-2 font-bold tracking-tight uppercase"
             >
-              <span className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'}>
+              <span className={isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}>
                 Admin Dashboard
               </span>
             </motion.p>
@@ -257,7 +203,7 @@ export default function AdminLogin() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className={`text-sm ${isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'} max-w-md mx-auto lg:mx-0`}
+              className={`text-sm ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'} max-w-md mx-auto lg:mx-0`}
             >
               Manage your products, orders, and analytics from one central dashboard.
             </motion.p>
@@ -275,10 +221,10 @@ export default function AdminLogin() {
                 { number: "2FA", label: "Security" }
               ].map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-[#111111]'}`}>
+                  <div className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
                     {stat.number}
                   </div>
-                  <div className={`text-xs ${isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'}`}>
+                  <div className={`text-xs ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
                     {stat.label}
                   </div>
                 </div>
@@ -294,11 +240,11 @@ export default function AdminLogin() {
             className="w-full max-w-md"
           >
             <motion.div
-              whileHover={{ boxShadow: isDarkMode ? "0 25px 50px rgba(231, 29, 43, 0.15)" : "0 25px 50px rgba(0, 0, 0, 0.1)" }}
-              className={`rounded-[20px] p-8 border backdrop-blur-sm ${
+              whileHover={{ boxShadow: isDarkMode ? "0 25px 50px rgba(251, 191, 36, 0.15)" : "0 25px 50px rgba(0, 0, 0, 0.1)" }}
+              className={`rounded-3xl p-8 border backdrop-blur-sm ${
                 isDarkMode 
-                  ? 'bg-[#151515]/80 border-[#2A2A2A] shadow-2xl' 
-                  : 'bg-white border-[#E5E5E5] shadow-2xl'
+                  ? 'bg-neutral-900/80 border-white/5 shadow-2xl' 
+                  : 'bg-white border-neutral-200 shadow-2xl'
               }`}
             >
               {/* Form Header */}
@@ -308,20 +254,20 @@ export default function AdminLogin() {
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                   className="inline-block mb-4"
                 >
-                  <div className={`w-16 h-16 rounded-full border-2 border-[#E71D2B] flex items-center justify-center ${
-                    isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#F5F5F5]'
+                  <div className={`w-16 h-16 rounded-full border-2 border-amber-400 flex items-center justify-center ${
+                    isDarkMode ? 'bg-neutral-950' : 'bg-neutral-50'
                   }`}>
-                    <HiOutlineLockClosed className="text-[#E71D2B]" size={28} />
+                    <HiOutlineLockClosed className="text-amber-400" size={28} />
                   </div>
                 </motion.div>
                 
-                <h2 className={`text-2xl font-bold mb-1 ${
-                  isDarkMode ? 'text-white' : 'text-[#111111]'
+                <h2 className={`text-2xl font-black tracking-tight mb-1 ${
+                  isDarkMode ? 'text-white' : 'text-neutral-900'
                 }`}>
                   Welcome Back
                 </h2>
                 <p className={`text-sm ${
-                  isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
+                  isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
                 }`}>
                   Sign in to your admin account
                 </p>
@@ -334,10 +280,10 @@ export default function AdminLogin() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mb-6 p-4 bg-[#E71D2B]/10 border border-[#E71D2B]/30 rounded-xl flex items-start space-x-3"
+                    className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start space-x-3"
                   >
-                    <HiOutlineExclamationCircle className="text-[#E71D2B] mt-0.5 flex-shrink-0" size={20} />
-                    <p className="text-sm text-[#E71D2B]">{loginError}</p>
+                    <HiOutlineExclamationCircle className="text-red-500 mt-0.5 flex-shrink-0" size={20} />
+                    <p className="text-sm text-red-500">{loginError}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -347,35 +293,31 @@ export default function AdminLogin() {
                 {/* Email Field */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
+                    isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
                   }`}>
                     Email Address
                   </label>
                   <div className="relative">
                     <HiOutlineMail className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                      errors.email ? 'text-[#E71D2B]' : isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
+                      errors.email ? 'text-red-500' : isDarkMode ? 'text-neutral-500' : 'text-neutral-400'
                     }`} size={20} />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="admin@urbangear.com"
+                      placeholder="Enter your admin email"
                       className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all outline-none ${
                         errors.email
-                          ? 'border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
+                          ? 'border-red-500 focus:ring-2 focus:ring-red-500/20'
                           : isDarkMode
-                            ? 'border-[#2A2A2A] bg-[#0A0A0A] text-white focus:border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
-                            : 'border-[#E5E5E5] bg-[#F5F5F5] text-[#111111] focus:border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
+                            ? 'border-white/10 bg-neutral-950 text-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20'
+                            : 'border-neutral-300 bg-neutral-50 text-neutral-900 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20'
                       }`}
                     />
                   </div>
                   {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-[#E71D2B] text-xs mt-1"
-                    >
+                    <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-xs mt-1">
                       {errors.email}
                     </motion.p>
                   )}
@@ -384,13 +326,13 @@ export default function AdminLogin() {
                 {/* Password Field */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
+                    isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
                   }`}>
                     Password
                   </label>
                   <div className="relative">
                     <HiOutlineLockClosed className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                      errors.password ? 'text-[#E71D2B]' : isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
+                      errors.password ? 'text-red-500' : isDarkMode ? 'text-neutral-500' : 'text-neutral-400'
                     }`} size={20} />
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -400,89 +342,38 @@ export default function AdminLogin() {
                       placeholder="Enter your password"
                       className={`w-full pl-10 pr-12 py-3 rounded-xl border transition-all outline-none ${
                         errors.password
-                          ? 'border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
+                          ? 'border-red-500 focus:ring-2 focus:ring-red-500/20'
                           : isDarkMode
-                            ? 'border-[#2A2A2A] bg-[#0A0A0A] text-white focus:border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
-                            : 'border-[#E5E5E5] bg-[#F5F5F5] text-[#111111] focus:border-[#E71D2B] focus:ring-2 focus:ring-[#E71D2B]/20'
+                            ? 'border-white/10 bg-neutral-950 text-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20'
+                            : 'border-neutral-300 bg-neutral-50 text-neutral-900 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20'
                       }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors ${
-                        isDarkMode ? 'text-[#B0B0B0] hover:text-white' : 'text-[#666666] hover:text-[#111111]'
+                        isDarkMode ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-neutral-900'
                       }`}
                     >
                       {showPassword ? <HiOutlineEyeOff size={20} /> : <HiOutlineEye size={20} />}
                     </button>
                   </div>
                   {errors.password && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-[#E71D2B] text-xs mt-1"
-                    >
+                    <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-xs mt-1">
                       {errors.password}
                     </motion.p>
                   )}
                 </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="rememberMe"
-                      checked={formData.rememberMe}
-                      onChange={handleInputChange}
-                      className="hidden"
-                    />
-                    <div className={`w-5 h-5 rounded border-2 mr-2 flex items-center justify-center transition-all ${
-                      formData.rememberMe
-                        ? 'bg-[#E71D2B] border-[#E71D2B]'
-                        : isDarkMode
-                          ? 'border-[#2A2A2A]'
-                          : 'border-[#E5E5E5]'
-                    }`}>
-                      {formData.rememberMe && (
-                        <motion.svg
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </motion.svg>
-                      )}
-                    </div>
-                    <span className={`text-sm ${
-                      isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'
-                    }`}>
-                      Remember me
-                    </span>
-                  </label>
-                  
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    className="text-sm text-[#E71D2B] hover:text-[#FF4D5A] font-medium"
-                  >
-                    Forgot Password?
-                  </motion.button>
-                </div>
-
                 {/* Login Button */}
                 <motion.button
                   type="submit"
                   disabled={isLoading}
                   whileHover={{ scale: isLoading ? 1 : 1.02 }}
                   whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  className={`w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center space-x-2 ${
+                  className={`w-full py-3 rounded-xl font-bold tracking-wide transition-all flex items-center justify-center space-x-2 ${
                     isLoading
-                      ? 'bg-[#E71D2B]/70 cursor-not-allowed'
-                      : 'bg-[#E71D2B] hover:bg-[#FF4D5A] shadow-lg shadow-[#E71D2B]/20 hover:shadow-xl hover:shadow-[#E71D2B]/30'
+                      ? 'bg-amber-400/70 cursor-not-allowed text-neutral-900'
+                      : 'bg-amber-400 text-neutral-950 hover:bg-amber-300 shadow-lg shadow-amber-400/20 hover:shadow-xl hover:shadow-amber-400/30'
                   }`}
                 >
                   {isLoading ? (
@@ -490,7 +381,7 @@ export default function AdminLogin() {
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        className="w-5 h-5 border-2 border-neutral-900 border-t-transparent rounded-full"
                       />
                       <span>Signing in...</span>
                     </>
@@ -501,28 +392,6 @@ export default function AdminLogin() {
                     </>
                   )}
                 </motion.button>
-
-                {/* Demo Credentials */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className={`p-4 rounded-xl text-xs ${
-                    isDarkMode ? 'bg-[#0A0A0A] border border-[#2A2A2A]' : 'bg-[#F5F5F5] border border-[#E5E5E5]'
-                  }`}
-                >
-                  <p className={`font-medium mb-2 ${isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'}`}>
-                    🔑 Demo Credentials:
-                  </p>
-                  <div className="space-y-1">
-                    <p className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'}>
-                      Email: <span className="text-[#E71D2B] font-mono">admin@urbangear.com</span>
-                    </p>
-                    <p className={isDarkMode ? 'text-[#B0B0B0]' : 'text-[#666666]'}>
-                      Pass: <span className="text-[#E71D2B] font-mono">admin123</span>
-                    </p>
-                  </div>
-                </motion.div>
               </form>
 
               {/* Back to Site Link */}
@@ -534,10 +403,10 @@ export default function AdminLogin() {
               >
                 <button
                   onClick={() => router.push('/')}
-                  className={`text-sm transition-colors ${
+                  className={`text-sm font-medium transition-colors ${
                     isDarkMode 
-                      ? 'text-[#B0B0B0] hover:text-white' 
-                      : 'text-[#666666] hover:text-[#111111]'
+                      ? 'text-neutral-500 hover:text-white' 
+                      : 'text-neutral-500 hover:text-neutral-900'
                   }`}
                 >
                   ← Back to Store

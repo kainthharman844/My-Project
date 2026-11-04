@@ -1,7 +1,8 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Head from 'next/head';
+import { FiCreditCard, FiLock, FiCheckCircle } from 'react-icons/fi';
+import { FaPaypal } from 'react-icons/fa';
 
 const PaymentPage = () => {
   const [activeTab, setActiveTab] = useState('credit');
@@ -51,65 +52,71 @@ const PaymentPage = () => {
   useEffect(() => {
     if (paymentSuccess) {
       const timer = setTimeout(() => {
-        setPaymentSuccess(false);
-      }, 3000);
+        // Optional: Redirect to home or orders page after success
+        // window.location.href = '/'; 
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [paymentSuccess]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 pt-26">
-      <Head>
-        <title>Payment | Lenscrafter Hub</title>
-      </Head>
+    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-[100px]">
       
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md w-full mx-auto">
+        
+        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold text-indigo-900">Lenscrafter Hub</h1>
-          <p className="mt-2 text-indigo-600">Complete your purchase</p>
+          <h1 className="text-3xl font-black tracking-tighter text-white uppercase">
+            URBAN<span className="text-amber-400">.CLOTHES</span>
+          </h1>
+          <p className="mt-2 text-neutral-400 font-medium">Complete your purchase securely</p>
         </motion.div>
 
+        {/* Card Container */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden"
+          className="bg-neutral-900 rounded-3xl shadow-2xl border border-white/5 overflow-hidden"
         >
-
           {/* Payment Tabs */}
-          <div className="border-b border-gray-200">
-            <div className="flex">
-              <button
-                onClick={() => setActiveTab('credit')}
-                className={`flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === 'credit'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Credit Card
-              </button>
-              <button
-                onClick={() => setActiveTab('paypal')}
-                className={`flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === 'paypal'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                PayPal
-              </button>
-            </div>
+          <div className="border-b border-white/5 flex">
+            <button
+              onClick={() => setActiveTab('credit')}
+              className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold tracking-wide transition-colors relative ${
+                activeTab === 'credit' ? 'text-amber-400' : 'text-neutral-500 hover:text-white'
+              }`}
+            >
+              <FiCreditCard className="w-4 h-4" />
+              Credit Card
+              {activeTab === 'credit' && (
+                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('paypal')}
+              className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold tracking-wide transition-colors relative ${
+                activeTab === 'paypal' ? 'text-amber-400' : 'text-neutral-500 hover:text-white'
+              }`}
+            >
+              <FaPaypal className="w-4 h-4" />
+              PayPal
+              {activeTab === 'paypal' && (
+                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400" />
+              )}
+            </button>
           </div>
 
-          {/* Payment Form */}
-          <div className="p-6">
+          {/* Payment Form Area */}
+          <div className="p-6 sm:p-8">
             <AnimatePresence mode="wait">
+              
+              {/* SUCCESS STATE */}
               {paymentSuccess ? (
                 <motion.div
                   key="success"
@@ -118,37 +125,44 @@ const PaymentPage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="text-center py-8"
                 >
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                    <svg
-                      className="h-6 w-6 text-green-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="mt-3 text-lg font-medium text-gray-900">Payment Successful!</h3>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                    className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-500/10 mb-6"
+                  >
+                    <FiCheckCircle className="h-10 w-10 text-green-500" />
+                  </motion.div>
+                  <h3 className="text-2xl font-black text-white mb-2">Payment Successful!</h3>
+                  <p className="text-sm text-neutral-400 max-w-[250px] mx-auto">
                     Your order has been processed. You'll receive a confirmation email shortly.
                   </p>
+                  <button 
+                    onClick={() => window.location.href = '/'}
+                    className="mt-8 px-6 py-2.5 rounded-full bg-white/5 text-white font-bold text-sm hover:bg-white/10 transition-colors"
+                  >
+                    Return to Store
+                  </button>
                 </motion.div>
+
+              /* PROCESSING STATE */
               ) : isProcessing ? (
                 <motion.div
                   key="processing"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="text-center py-12"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center py-16"
                 >
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Processing your payment...</p>
+                  <div className="relative w-16 h-16 mx-auto mb-6">
+                    <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                  <h3 className="text-lg font-bold text-white">Processing Payment</h3>
+                  <p className="mt-2 text-sm text-neutral-400">Please do not close this window.</p>
                 </motion.div>
+
+              /* CREDIT CARD FORM */
               ) : activeTab === 'credit' ? (
                 <motion.form
                   key="credit"
@@ -156,129 +170,113 @@ const PaymentPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
                   onSubmit={handleSubmit}
-                  className="space-y-4"
+                  className="space-y-5"
                 >
                   <div>
-                    <label htmlFor="card-number" className="block text-sm font-medium text-gray-700">
-                      Card number
+                    <label htmlFor="card-number" className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                      Card Number
                     </label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="relative">
                       <input
                         type="text"
                         id="card-number"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                         maxLength={19}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                        className="block w-full px-4 py-3 bg-neutral-950 border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/60 transition-all font-mono"
                         placeholder="0000 0000 0000 0000"
                         required
                       />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                        <FiCreditCard className="h-5 w-5 text-neutral-500" />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="card-name" className="block text-sm font-medium text-gray-700">
-                      Name on card
+                    <label htmlFor="card-name" className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                      Name on Card
                     </label>
-                    <div className="mt-1">
-                      <input
-                        type="text"
-                        id="card-name"
-                        value={cardName}
-                        onChange={(e) => setCardName(e.target.value)}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="John Smith"
-                        required
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      id="card-name"
+                      value={cardName}
+                      onChange={(e) => setCardName(e.target.value)}
+                      className="block w-full px-4 py-3 bg-neutral-950 border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/60 transition-all"
+                      placeholder="JOHN DOE"
+                      required
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="expiry" className="block text-sm font-medium text-gray-700">
-                        Expiry date
+                      <label htmlFor="expiry" className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                        Expiry Date
                       </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="expiry"
-                          value={expiry}
-                          onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                          maxLength={5}
-                          className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="MM/YY"
-                          required
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        id="expiry"
+                        value={expiry}
+                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                        maxLength={5}
+                        className="block w-full px-4 py-3 bg-neutral-950 border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/60 transition-all font-mono"
+                        placeholder="MM/YY"
+                        required
+                      />
                     </div>
 
                     <div>
-                      <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="cvv" className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
                         CVV
                       </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
+                      <div className="relative">
                         <input
                           type="text"
                           id="cvv"
                           value={cvv}
                           onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ''))}
                           maxLength={4}
-                          className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                          className="block w-full px-4 py-3 bg-neutral-950 border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/60 transition-all font-mono"
                           placeholder="123"
                           required
                         />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <svg
-                            className="h-5 w-5 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                          </svg>
+                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                          <FiLock className="h-4 w-4 text-neutral-500" />
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-4">
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                      className="w-full flex justify-center py-4 px-4 rounded-xl text-sm font-black text-neutral-950 bg-amber-400 hover:bg-amber-300 transition-colors shadow-lg shadow-amber-400/20"
                     >
-                      Pay 
-                    </button>
+                      PAY NOW
+                    </motion.button>
                   </div>
                 </motion.form>
+
+              /* PAYPAL FORM */
               ) : (
                 <motion.div
                   key="paypal"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="space-y-6"
+                  className="space-y-6 py-4"
                 >
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">
-                      You'll be redirected to PayPal to complete your purchase securely.
+                  <div className="rounded-xl bg-neutral-950 border border-white/5 p-5">
+                    <p className="text-sm text-neutral-400 text-center leading-relaxed">
+                      You will be redirected to PayPal to complete your purchase securely.
                     </p>
                   </div>
-                  <button
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => {
                       setIsProcessing(true);
@@ -287,38 +285,26 @@ const PaymentPage = () => {
                         setPaymentSuccess(true);
                       }, 2000);
                     }}
-                    className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                    className="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-black text-white bg-[#0070ba] hover:bg-[#005ea6] transition-colors shadow-lg shadow-[#0070ba]/20"
                   >
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fab"
-                      data-icon="paypal"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 384 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4.7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9.7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"
-                      ></path>
-                    </svg>
-                    Pay with PayPal
-                  </button>
+                    <FaPaypal className="w-5 h-5 mr-2" />
+                    PAY WITH PAYPAL
+                  </motion.button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </motion.div>
 
+        {/* Footer Note */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-6 text-center text-sm text-gray-600"
+          className="mt-8 flex items-center justify-center gap-2 text-xs text-neutral-500 font-medium"
         >
-          <p>Secure payment processing. Your data is encrypted.</p>
+          <FiLock className="w-4 h-4" />
+          <p>Secure 256-bit SSL encrypted payment processing.</p>
         </motion.div>
       </div>
     </div>
